@@ -13,9 +13,15 @@
    (脚本)        (prompts/ 剧本)     (脚本)          (脚本)
 ```
 
-排版效果(演示数据,4.5pt 双面极限规格;红=关键名词、蓝=数字、粗=考点):
+实战战绩: **677 页课件 → 一张 A4 双面**(下图即真实成品截图,4.5pt 极限规格;
+红=关键名词、蓝=数字、粗=考点)。考场实测: 理论题**全部命中,零漏点**:
 
-![演示效果页1](examples/demo_p1.png)
+![真实成品 · 正面](examples/real_case/real_p1.jpg)
+![真实成品 · 背面](examples/real_case/real_p2.jpg)
+
+> 截图已压缩;逐字细节以 make_cheat.py 生成的 docx 为准。内容块格式示例见
+> [examples/demo_blocks](examples/demo_blocks/)。(真实成品版权归对应课程作者,
+> 仅作效果展示;如需二次分发请先确认课件版权。)
 
 ## 它解决什么问题
 
@@ -43,10 +49,14 @@
 
 ```bash
 pip install pymupdf python-docx
+# Windows + Word 用户跑页数校验还需:
+pip install pywin32
+# (非 Windows 用户装 LibreOffice 并加入 PATH 即可,verify_pages.py 自动兜底)
+
 python scripts/analyze_pdf.py 课件.pdf -o analysis_out
-#   输出: 全文txt(逐页) + pages_report.csv + 低密度页清单(疑似公式页/图片页)
-python scripts/render_pages.py 课件.pdf -f analysis_out/低密度页清单.txt -o png_out
-#   把图页渲染成 PNG——公式/图表在 PPT 导出的 PDF 里是图片对象,文字层里没有!
+#   输出: 全文txt(逐页) + pages_report.csv + 视觉转录候选页.txt(A/B/C 三档)
+python scripts/render_pages.py 课件.pdf -f analysis_out/视觉转录候选页.txt -o png_out
+#   把候选页渲染成 PNG——公式/图表在 PPT 导出的 PDF 里是图片对象,文字层里没有!
 ```
 
 **② 按 prompts/ 剧本驱动你的 AI**(核心,约 1 小时)
@@ -86,10 +96,18 @@ AI 按剧本 03 产出的块 txt 直接可排版,只有 5 种标记:
 
 ## 常见坑(都是实战踩过的)
 
-- **公式会"凭空消失"**: PPT 另存的 PDF,公式是图片对象,文字层提取为空。所以
-  ① 用低密度页检测找出来,② 渲染成 PNG 让多模态 AI 转录,**③ 一定抽翻一遍 PDF**
-  ——有的页文字层有标题但正文全是图,不在低密度清单里(实战: 88 个图页里约 1/4
-  属于这种);
+- **公式会"凭空消失"**: PPT 另存的 PDF,公式/图表是图片对象,文字层提取为空。
+  analyze_pdf.py 用"零文字页 + 大面积图页"双信号自动揪出它们(A/B/C 三档),
+  渲染成 PNG 交给 AI 转录即可,不必人工逐页翻 PDF(该规则在 677 页真实课件上
+  校准过: 能召回人工筛选内容图页的 94%);
+- **课件每页都带插图怎么办**: 候选页 >150 页时不要盲目全转。按剧本 02 附录的
+  "两轮工作流": 渲染全部候选 → 让 AI 先快速筛选"哪些页的图含文字层没有的信息"
+  → 只对命中页做正式转录,工作量可砍半且不漏;
+- **课件是扫描版(整本无文字层)**: analyze_pdf.py 会报告大量 A 档页。此时把 PDF
+  分批发给多模态 AI 直接 OCR+整理(每批 30~50 页),拿到文本后再走剧本 03;
+- **AI 输出格式乱了**: 剧本 03 要求严格标记语法,若 AI 擅自加 markdown 表格、
+  漏写〈〉、一次输出过长,让它"把每个块放进纯文本代码块,逐块输出、逐块确认",
+  再继续;
 - **压缩一定会漏,必须跑剧本 04**: "AI 凭印象自审"不靠谱,三步法(先列原文考点
   清单 → 逐条比对 → 输出缺口表)实测能把漏报压到零;
 - **课件内部会自相矛盾**: 同一模型参数量出现三种写法(652 亿/65.2B/630 亿)——
@@ -105,13 +123,14 @@ AI 按剧本 03 产出的块 txt 直接可排版,只有 5 种标记:
 prompts/   剧本(模型无关,复制粘贴给任意 AI)
 scripts/   analyze_pdf / render_pages / make_cheat / verify_pages
 config/    style.json —— 排版默认参数(字号/行距/颜色/页边距)
-examples/  演示: 内容块样例 + 排版效果图
+examples/  内容块样例(demo_blocks)+ 真实成品案例图(real_case)
 ```
 
 ## 合规声明
 
 本项目仅用于**规则明确允许携带资料**(开卷/半开卷)的考试。使用前请确认你的考场
-规则;课件与试题内容版权归原作者所有;examples/ 目录为演示数据,不代表任何真实课程。
+规则;课件与试题内容版权归原作者所有,examples/real_case 为真实课程成品演示
+(版权归对应课程作者,仅作效果展示,二次分发请先确认版权),demo_blocks 为演示数据。
 作弊行为与作者无关,请勿用于违规场景。
 
 ## License

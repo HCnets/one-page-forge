@@ -4,8 +4,11 @@ png_out/
 __pycache__/
 *.pyc
 
-# 生成的文档(小抄 docx/pdf 属个人产物,不纳入版本库;演示效果图 png 保留)
+# 生成的文档(小抄 docx/pdf 属个人产物,不纳入版本库;
+# examples/real_case 的真实案例图与 demo_blocks 样例用 ! 白名单放行)
 *.docx
 *.pdf
+*.jpg
 *.png
-!examples/demo_p1.png
+!examples/real_case/real_p1.jpg
+!examples/real_case/real_p2.jpg
