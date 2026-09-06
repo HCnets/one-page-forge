@@ -1,0 +1,20 @@
+{
+  "page": {
+    "width_cm": 21.0,
+    "height_cm": 29.7,
+    "margin_cm": 0.5
+  },
+  "font": {
+    "name": "等线 Light",
+    "size_pt": 4.5,
+    "line_spacing_pt": 4.7
+  },
+  "color": {
+    "enabled": true,
+    "red": "FF0000",
+    "blue": "00B0F0",
+    "red_limit": 2,
+    "bold_limit": 2
+  },
+  "line_capacity_hint": 172
+}

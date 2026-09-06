@@ -1,0 +1,11 @@
+# 运行时产物(各人自己的课件分析输出)
+analysis_out/
+png_out/
+__pycache__/
+*.pyc
+
+# 生成的文档(小抄 docx/pdf 属个人产物,不纳入版本库;演示效果图 png 保留)
+*.docx
+*.pdf
+*.png
+!examples/demo_p1.png
