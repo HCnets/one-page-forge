@@ -162,10 +162,12 @@ AI 按剧本 03 产出的块 txt 直接可排版,只有 5 种标记:
   `verify_pages.py --max-pages 1` 并大幅砍内容;
 - **考前翻练不可省**: 4.5pt 的纸只有"熟悉位置"才能秒翻。考前 30 分钟用剧本 06
   的翻练卡过 2~3 轮,考场策略: 先写论述题抢分,再查细节题;
-- **非 Windows 用户先改字体**: config/style.json 里 font.name 默认 "等线 Light"
-  (Windows 字体)。LibreOffice/其他系统没有它会**静默替换字体**,4.5pt 的折行、
-  密度全部走样,页数校验也会失真。先把 font.name 改成你系统里的中文字体
-  (如 Noto Sans CJK SC),再跑 make_cheat.py 与 verify_pages.py;
+- **非 Windows 用户先改字体**: config/style.json 默认 "等线 Light"(Windows +
+  Office 自带,4.5pt 极限密度下的实测最优: 笔画细不糊、字形紧凑省行宽)。
+  它是微软版权字体,**无法随本仓库分发**;Mac/Linux 请安装开源等效
+  **思源黑体 Light / Noto Sans CJK SC Light(250 字重)**,把 font.name 改过去
+  (不要用 Regular 字重——小字号下明显发闷、同样纸面会少排内容),改完重跑
+  make_cheat.py 与 verify_pages.py;
 - **命令行劝退?看两种用法**: 本仓库适合"愿意跑 4 条命令 + 有一个 AI 客户端"的
   人。如果你完全不想碰命令行,把仓库转发给会 Python 的同学代跑脚本,你只负责
   喂 AI;如果你用的客户端支持 Agent(Claude Code / Cursor / ZCode 等),直接把
