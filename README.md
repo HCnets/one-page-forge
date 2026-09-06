@@ -48,7 +48,7 @@
 **① 本地跑分析脚本,把课件变成"文本 + 图页清单"**
 
 ```bash
-pip install pymupdf python-docx
+pip install -r requirements.txt
 # Windows + Word 用户跑页数校验还需:
 pip install pywin32
 # (非 Windows 用户装 LibreOffice 并加入 PATH 即可,verify_pages.py 自动兜底)
@@ -115,7 +115,15 @@ AI 按剧本 03 产出的块 txt 直接可排版,只有 5 种标记:
 - **双面合规先问老师**: 老师只认"一张 A4"的话,双面通常没问题;只许单面就
   `verify_pages.py --max-pages 1` 并大幅砍内容;
 - **考前翻练不可省**: 4.5pt 的纸只有"熟悉位置"才能秒翻。考前 30 分钟用剧本 06
-  的翻练卡过 2~3 轮,考场策略: 先写论述题抢分,再查细节题。
+  的翻练卡过 2~3 轮,考场策略: 先写论述题抢分,再查细节题;
+- **非 Windows 用户先改字体**: config/style.json 里 font.name 默认 "等线 Light"
+  (Windows 字体)。LibreOffice/其他系统没有它会**静默替换字体**,4.5pt 的折行、
+  密度全部走样,页数校验也会失真。先把 font.name 改成你系统里的中文字体
+  (如 Noto Sans CJK SC),再跑 make_cheat.py 与 verify_pages.py;
+- **命令行劝退?看两种用法**: 本仓库适合"愿意跑 4 条命令 + 有一个 AI 客户端"的
+  人。如果你完全不想碰命令行,把仓库转发给会 Python 的同学代跑脚本,你只负责
+  喂 AI;如果你用的客户端支持 Agent(Claude Code / Cursor / ZCode 等),直接把
+  本仓库路径丢给它,让它读 README 自主执行——所有剧本和脚本它都能自己调度。
 
 ## 目录结构
 

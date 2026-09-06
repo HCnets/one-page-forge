@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-"""self_test.py — 冒烟自测:验证排版与 PDF 分析脚本在改动后仍可用
+"""self_test.py — 冒烟自测:验证脚本在改动后仍可用(本地与 CI 共用)
 
 自动执行:
   1. 用 PyMuPDF 现场生成一份 3 页测试 PDF(第1页纯文字 / 第2页嵌入大图 /
      第3页大字标题几乎无文字),模拟课件三种典型页;
   2. 跑 analyze_pdf.py → 断言 A 档含第 3 页、B 档含第 2 页;
-  3. 跑 make_cheat.py(用 examples/demo_blocks 演示内容)→ 断言 docx 生成。
+  3. 跑 render_pages.py → 断言 3 张 PNG 全部产出;
+  4. 跑 make_cheat.py(用 examples/demo_blocks 演示内容)→ 断言 docx 生成。
 verify_pages.py 需要 Word/LibreOffice,不进自测(手动跑)。
 
 用法:  python scripts/self_test.py
-失败时退出码非 0 并打印原因。
+失败时退出码非 0 并打印原因。CI(.github/workflows/test.yml)每次 push 自动运行。
 """
 import os
 import shutil
@@ -57,11 +58,11 @@ def main():
     tmp = tempfile.mkdtemp(prefix="forge_selftest_")
     fails = []
     try:
-        print("[1/3] 生成测试 PDF...")
+        print("[1/4] 生成测试 PDF...")
         pdf = os.path.join(tmp, "test.pdf")
         make_test_pdf(pdf)
 
-        print("[2/3] analyze_pdf.py 三档检测...")
+        print("[2/4] analyze_pdf.py 三档检测...")
         out = run(["scripts/analyze_pdf.py", pdf, "-o", os.path.join(tmp, "ana")], cwd=REPO)
         with open(os.path.join(tmp, "ana", "视觉转录候选页.txt"), encoding="utf-8") as f:
             report = f.read()
@@ -79,7 +80,15 @@ def main():
         if "2" not in sec_pages("B档"):
             fails.append("第2页(大图)未进 B 档 -> " + sec_pages("B档"))
 
-        print("[3/3] make_cheat.py 演示排版...")
+        print("[3/4] render_pages.py 渲染...")
+        render_dir = os.path.join(tmp, "render")
+        run(["scripts/render_pages.py", pdf, "--pages", "1-3", "-o", render_dir], cwd=REPO)
+        for pno in (1, 2, 3):
+            png = os.path.join(render_dir, f"p{pno:03d}.png")
+            if not os.path.exists(png) or os.path.getsize(png) < 1000:
+                fails.append(f"渲染缺页或文件过小: {png}")
+
+        print("[4/4] make_cheat.py 演示排版...")
         blocks = os.path.join(REPO, "examples", "demo_blocks")
         out_docx = os.path.join(tmp, "out.docx")
         run(["scripts/make_cheat.py", os.path.join(blocks, "块*.txt"), "-o", out_docx], cwd=REPO)
