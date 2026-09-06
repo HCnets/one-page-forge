@@ -6,7 +6,8 @@
      第3页大字标题几乎无文字),模拟课件三种典型页;
   2. 跑 analyze_pdf.py → 断言 A 档含第 3 页、B 档含第 2 页;
   3. 跑 render_pages.py → 断言 3 张 PNG 全部产出;
-  4. 跑 make_cheat.py(用 examples/demo_blocks 演示内容)→ 断言 docx 生成。
+  4. 跑 make_cheat.py(用 examples/demo_blocks 演示内容)→ 断言 docx 生成;
+  5. transcribe_images.py / forge.py 语法检查(--help 退出码)。
 verify_pages.py 需要 Word/LibreOffice,不进自测(手动跑)。
 
 用法:  python scripts/self_test.py
@@ -95,8 +96,10 @@ def main():
         if not os.path.exists(out_docx) or os.path.getsize(out_docx) < 5000:
             fails.append("make_cheat 输出 docx 缺失或过小")
 
-        print("[5/5] transcribe_images.py 语法检查...")
+        print("[5/6] transcribe_images.py 语法检查...")
         run(["scripts/transcribe_images.py", "--help"], cwd=REPO)
+        print("[6/6] forge.py 语法检查...")
+        run(["scripts/forge.py", "--help"], cwd=REPO)
 
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

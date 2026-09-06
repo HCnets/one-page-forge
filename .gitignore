@@ -1,6 +1,8 @@
-# 运行时产物(各人自己的课件分析输出)
+# 运行时产物(各人自己的课件分析输出 / forge 全自动输出)
 analysis_out/
 png_out/
+forge_demo_out/
+forge_out/
 __pycache__/
 *.pyc
 
