@@ -58,11 +58,11 @@ def main():
     tmp = tempfile.mkdtemp(prefix="forge_selftest_")
     fails = []
     try:
-        print("[1/4] 生成测试 PDF...")
+        print("[1/5] 生成测试 PDF...")
         pdf = os.path.join(tmp, "test.pdf")
         make_test_pdf(pdf)
 
-        print("[2/4] analyze_pdf.py 三档检测...")
+        print("[2/5] analyze_pdf.py 三档检测...")
         out = run(["scripts/analyze_pdf.py", pdf, "-o", os.path.join(tmp, "ana")], cwd=REPO)
         with open(os.path.join(tmp, "ana", "视觉转录候选页.txt"), encoding="utf-8") as f:
             report = f.read()
@@ -80,7 +80,7 @@ def main():
         if "2" not in sec_pages("B档"):
             fails.append("第2页(大图)未进 B 档 -> " + sec_pages("B档"))
 
-        print("[3/4] render_pages.py 渲染...")
+        print("[3/5] render_pages.py 渲染...")
         render_dir = os.path.join(tmp, "render")
         run(["scripts/render_pages.py", pdf, "--pages", "1-3", "-o", render_dir], cwd=REPO)
         for pno in (1, 2, 3):
@@ -88,12 +88,15 @@ def main():
             if not os.path.exists(png) or os.path.getsize(png) < 1000:
                 fails.append(f"渲染缺页或文件过小: {png}")
 
-        print("[4/4] make_cheat.py 演示排版...")
+        print("[4/5] make_cheat.py 演示排版...")
         blocks = os.path.join(REPO, "examples", "demo_blocks")
         out_docx = os.path.join(tmp, "out.docx")
         run(["scripts/make_cheat.py", os.path.join(blocks, "块*.txt"), "-o", out_docx], cwd=REPO)
         if not os.path.exists(out_docx) or os.path.getsize(out_docx) < 5000:
             fails.append("make_cheat 输出 docx 缺失或过小")
+
+        print("[5/5] transcribe_images.py 语法检查...")
+        run(["scripts/transcribe_images.py", "--help"], cwd=REPO)
 
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
